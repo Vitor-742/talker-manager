@@ -41,3 +41,10 @@ app.get('/talker/:id', (req, res) => {
     });
   }
 });
+
+app.post('/login', (req, res) => {
+  // console.log(Math.random().toString(16).substr(2));
+  // const { email, password } = req.body;
+  const randomToken = Math.random().toString(16).substr(7) + Math.random().toString(16).substr(7);
+  res.send({ token: randomToken });
+});
