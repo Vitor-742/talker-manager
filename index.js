@@ -42,9 +42,26 @@ app.get('/talker/:id', (req, res) => {
   }
 });
 
+const messageNoEmail = {
+  message: 'O campo "email" é obrigatório',
+};
+const messageWrongEmailForm = {
+  message: 'O "email" deve ter o formato "email@email.com"',
+};
+const messageNoPassword = {
+  message: 'O campo "password" é obrigatório',
+};
+const messageShortPassword = {
+  message: 'O "password" deve ter pelo menos 6 caracteres',
+};
+
 app.post('/login', (req, res) => {
-  // console.log(Math.random().toString(16).substr(2));
-  // const { email, password } = req.body;
+  const { email, password } = req.body;
+  const emailRegex = /\S+@\S+\.\S+/;
+  if (!email) res.status(400).json(messageNoEmail);
+  if (!email.match(emailRegex)) res.status(400).json(messageWrongEmailForm);
+  if (!password) res.status(400).json(messageNoPassword);
+  if (password.length < 6) res.status(400).json(messageShortPassword);
   const randomToken = Math.random().toString(16).substr(7) + Math.random().toString(16).substr(7);
   res.send({ token: randomToken });
 });
