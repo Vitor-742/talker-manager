@@ -17,9 +17,6 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
-const data = fs.readFileSync('./talker.json', 'utf8');
-const parseData = JSON.parse(data);
-
 app.get('/talker', (req, res) => {
   try {
     const read = fs.readFileSync('./talker.json', 'utf8');
@@ -33,8 +30,8 @@ app.get('/talker', (req, res) => {
 app.get('/talker/:id', (req, res) => {
   const { id } = req.params;
   try {
-    // const data = fs.readFileSync('./talker.json', 'utf8');
-    // const parseData = JSON.parse(data);
+    const data = fs.readFileSync('./talker.json', 'utf8');
+    const parseData = JSON.parse(data);
     const peopleId = parseData.find((people) => people.id === parseInt(id, 10));
     if (!peopleId) throw new Error();
     res.status(200).json(peopleId);
@@ -132,7 +129,8 @@ const validateAge = (req, res, next) => {
 const validateTalk = (req, res, next) => {
   const people = req.body;
   const { talk } = people;
-  if (!talk || !talk.rate || !talk.watchedAt) next(res.status(400).json(messageNoRateOrDate));
+  if (!talk || !talk.watchedAt) next(res.status(400).json(messageNoRateOrDate));
+  if (talk.rate !== 0 && !talk.rate) next(res.status(400).json(messageNoRateOrDate));
   next();
 };
 
@@ -152,6 +150,8 @@ app.post('/talker',
   validateTalk,
   validateTalkContent,
   (req, res) => {
+  const data = fs.readFileSync('./talker.json', 'utf8');
+  const parseData = JSON.parse(data);
   const people = req.body;
   people.id = parseData[parseData.length - 1].id + 1;
   parseData.push(people);
@@ -159,3 +159,23 @@ app.post('/talker',
   fs.writeFileSync('./talker.json', stringifyData);
   res.status(201).json(people);
 });
+
+app.put('/talker/:id',
+  validateToken,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateTalkContent,
+  (req, res) => {
+    const { id } = req.params;
+    const uptPeople = req.body;
+    const numId = Number(id);
+    const data = fs.readFileSync('./talker.json', 'utf8');
+    const parseData = JSON.parse(data);
+    uptPeople.id = numId;
+    const deleteLastPeople = parseData.filter((people) => people.id !== numId);
+    deleteLastPeople.push(uptPeople);
+    const stringifyData = JSON.stringify(deleteLastPeople);
+    fs.writeFileSync('./talker.json', stringifyData);
+    res.status(200).json(uptPeople);
+  });
