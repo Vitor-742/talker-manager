@@ -7,6 +7,7 @@ app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
+const jsonTalker = './talker.json';
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -19,7 +20,7 @@ app.listen(PORT, () => {
 
 app.get('/talker', (req, res) => {
   try {
-    const read = fs.readFileSync('./talker.json', 'utf8');
+    const read = fs.readFileSync(jsonTalker, 'utf8');
     const parseRead = JSON.parse(read);
     res.status(200).json(parseRead);
   } catch (error) {
@@ -30,7 +31,7 @@ app.get('/talker', (req, res) => {
 app.get('/talker/:id', (req, res) => {
   const { id } = req.params;
   try {
-    const data = fs.readFileSync('./talker.json', 'utf8');
+    const data = fs.readFileSync(jsonTalker, 'utf8');
     const parseData = JSON.parse(data);
     const peopleId = parseData.find((people) => people.id === parseInt(id, 10));
     if (!peopleId) throw new Error();
@@ -150,13 +151,13 @@ app.post('/talker',
   validateTalk,
   validateTalkContent,
   (req, res) => {
-  const data = fs.readFileSync('./talker.json', 'utf8');
+  const data = fs.readFileSync(jsonTalker, 'utf8');
   const parseData = JSON.parse(data);
   const people = req.body;
   people.id = parseData[parseData.length - 1].id + 1;
   parseData.push(people);
   const stringifyData = JSON.stringify(parseData);
-  fs.writeFileSync('./talker.json', stringifyData);
+  fs.writeFileSync(jsonTalker, stringifyData);
   res.status(201).json(people);
 });
 
@@ -170,12 +171,12 @@ app.put('/talker/:id',
     const { id } = req.params;
     const uptPeople = req.body;
     const numId = Number(id);
-    const data = fs.readFileSync('./talker.json', 'utf8');
+    const data = fs.readFileSync(jsonTalker, 'utf8');
     const parseData = JSON.parse(data);
     uptPeople.id = numId;
     const deleteLastPeople = parseData.filter((people) => people.id !== numId);
     deleteLastPeople.push(uptPeople);
     const stringifyData = JSON.stringify(deleteLastPeople);
-    fs.writeFileSync('./talker.json', stringifyData);
+    fs.writeFileSync(jsonTalker, stringifyData);
     res.status(200).json(uptPeople);
   });
