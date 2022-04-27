@@ -179,4 +179,17 @@ app.put('/talker/:id',
     const stringifyData = JSON.stringify(deleteLastPeople);
     fs.writeFileSync(jsonTalker, stringifyData);
     res.status(200).json(uptPeople);
+});
+
+app.delete('/talker/:id',
+  validateToken,
+  (req, res) => {
+    const { id } = req.params;
+    const numId = Number(id);
+    const data = fs.readFileSync(jsonTalker, 'utf8');
+    const parseData = JSON.parse(data);
+    const newList = parseData.filter((people) => people.id !== numId);
+    const stringifyData = JSON.stringify(newList);
+    fs.writeFileSync(jsonTalker, stringifyData);
+    res.status(204).end();
   });
