@@ -22,7 +22,9 @@ const parseData = JSON.parse(data);
 
 app.get('/talker', (req, res) => {
   try {
-    res.status(200).json(parseData);
+    const read = fs.readFileSync('./talker.json', 'utf8');
+    const parseRead = JSON.parse(read);
+    res.status(200).json(parseRead);
   } catch (error) {
     res.status(200).json([]);
   }
@@ -63,8 +65,9 @@ app.post('/login', (req, res) => {
   if (!email.match(emailRegex)) res.status(400).json(messageWrongEmailForm);
   if (!password) res.status(400).json(messageNoPassword);
   if (password.length < 6) res.status(400).json(messageShortPassword);
-  const randomToken = Math.random().toString(16).substr(7) + Math.random().toString(16).substr(7);
-  res.send({ token: randomToken });
+  const randomToken = Math.random().toString(16).substr(2) + Math.random().toString(16).substr(2);
+  const token16 = randomToken.substr(1, 16);
+  res.send({ token: token16 });
 });
 
 const messageNoToken = {
@@ -155,4 +158,4 @@ app.post('/talker',
   const stringifyData = JSON.stringify(parseData);
   fs.writeFileSync('./talker.json', stringifyData);
   res.status(201).json(people);
-});// teste
+});
